@@ -1,0 +1,5 @@
+group Module;
+
+main(e) ::= <<
+module.cs: <e>
+>>

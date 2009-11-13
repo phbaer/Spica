@@ -1,0 +1,5 @@
+group Struct;
+
+main(e) ::= <<
+struct.java: <e>
+>>

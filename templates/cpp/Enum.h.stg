@@ -1,0 +1,5 @@
+group Enum;
+
+main(e) ::= <<
+enum.h: <e>
+>>
