@@ -1,0 +1,3 @@
+[submodule "Castor"]
+	path = Castor
+	url = git://github.com/phbaer/Castor.git
