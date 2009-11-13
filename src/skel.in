@@ -1,0 +1,3 @@
+#!/bin/bash
+exec -a `basename $0` mono @SpicaInstall@/bin/`basename $0`.exe "$@"
+
