@@ -1,5 +1,77 @@
+// Aastra Template
+
 group Struct;
 
 main(e) ::= <<
-struct.h: <e>
+#ifndef <e.Namespace;format="upper",separator="_">_<e.Name; format="upper">_H
+#define <e.Namespace;format="upper",separator="_">_<e.Name; format="upper">_H 1
+
+/*
+ * This file was automatically generated from <generator_source_file> by <generator_name> <generator_version>.
+ *
+ * DO NOT EDIT, CHANGES WILL BE OVERWRITTEN!
+ *
+ * <generator_copyright:{x|<x>}; separator="\n * ">
+ *
+ * struct.h: <e>
+ */
+
+<e.Namespace:{n|namespace <n; format="lower"> \{ }>
+
+#include \<boost/smart_ptr.hpp\>
+
+class <e.Name>;
+
+typedef boost::smart_ptr\<<e.Name>\> <e.Name>Ptr;
+
+class <e.Name><if(e.SuperTypes.Count)> : public <e.SuperTypes.Keys; separator=", "><endif>
+{
+	private:
+<e.Fields.Values:{f|
+		<f.FieldType><if(f.Primitive)>Ptr<endif> __field_<f.Name>;
+}>
+
+	public:
+		<e.Name>()<if(e.Fields.Count)> :
+<e.Fields.Values:{f|
+			__field_<f.Name>(<f.DefaultValue>)}; separator=",\n"><endif>
+
+		{
+<e.Fields.Values:{f|<if(!f.Primitive)>
+			this->__field_<f.Name> = <f.FieldType>Ptr(new <f.FieldType>);<endif>
+}>
+		}
+
+		~<e.Name>()
+		{
+		}
+
+<e.Fields.Values:{f|
+		/**
+		 * Getter for <f>
+		 * @return Value (<f.FieldType>) of the structure variable <f.Name>
+		 */
+		inline <f.FieldType><if(!f.Primitive)>Ptr<endif> &get<f.Name; format="fupper">()
+		{
+			return this->__field_<f.Name>;
+		}
+
+		/**
+		 * Setter for <f>
+		 * @param value Value (<f.FieldType>) for the structure variable <f.Name>
+		 */
+		inline void set<f.Name; format="fupper">(<f.FieldType><if(!f.Primitive)>Ptr&<endif> value)
+		{
+			this->__field_<f.Name> = value;
+		}
+
+}>
+	protected:
+};
+
+<e.Namespace:{n|\} }>
+
+#endif /* <e.Namespace;format="upper",separator="_">_<e.Name; format="upper">_H */
+
 >>
+
