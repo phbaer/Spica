@@ -1,13 +1,17 @@
 // SpicaML grammar for ANTLR v3
 //  
-// Philipp A. Baer <phbaer@npw.net>
+// Philipp A. Baer <ph@baer.net>
+//
+// 2009 by Spica Robotics Project
+// http://spica-robotics.net/
+//
+// 2009 by DFKI RIC Bremen
+// http://robotik.dfki-bremen.de/
 //
 // 2006-2009 by Carpe Noctem Robotic Soccer
 // Distributed Systems Group, Kassel University, Germany
 // http://carpenoctem.das-lab.net/
-//
-// 2009 by DFKI RIC Bremen
-// http://robotik.dfki-bremen.de/
+
 
 grammar SpicaML;
 options { language = CSharp2; output = AST; }
@@ -306,7 +310,7 @@ misc_id_all
 misc_id_prim
 	:	(
 		 BOOL | UINT8 | UINT16 | UINT32 | UINT64 | INT8 | INT16 |
-		 INT32 | INT64 | FLOAT | DOUBLE | STRING | ADDRESS
+		 INT32 | INT64 | FLOAT | DOUBLE | FIXED | STRING | ADDRESS
 		)
 	;
 misc_version
@@ -339,7 +343,7 @@ FLOAT      : 'float'      ; DOUBLE    : 'double'    ; STRING    : 'string'     ;
 ADDRESS    : 'address'    ; EOL       : ';'         ; TYPE      : 'type'       ;
 SUBEXDEF   : 'subexdef'   ; CARD      : 'card'      ; PROTO     : 'proto'      ;
 RANGE      : '-'          ; SPEC      : 'spec'      ; NOSPEC    : 'nospec'     ;
-DST        : 'dst'        ; FIELDSPEC : 'fieldspec' ;
+DST        : 'dst'        ; FIELDSPEC : 'fieldspec' ; FIXED     : 'fixed'      ;
 
 fragment UINT
 	:	( '0'..'9' )+ ;
