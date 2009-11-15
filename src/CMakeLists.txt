@@ -15,7 +15,7 @@ set(Aastra_OUT
 set(Aastra_LIBS
     "-r:${CMAKE_CURRENT_SOURCE_DIR}/../lib/Antlr3.Runtime.dll"
     "-r:${CMAKE_CURRENT_SOURCE_DIR}/../lib/StringTemplate.dll"
-    "-r:${CMAKE_CURRENT_SOURCE_DIR}/../lib/Spica.Castor.dll")
+    "-r:${SpicaInstall}/bin/Spica.Castor.dll")
 set(Aastra_CP
     "${CMAKE_CURRENT_SOURCE_DIR}/../lib/antlr-2.7.7.jar:${CMAKE_CURRENT_SOURCE_DIR}/../lib/antlr-3.1.3.jar:${CMAKE_CURRENT_SOURCE_DIR}/../lib/stringtemplate-3.2.jar")
 

@@ -160,7 +160,6 @@ namespace Spica
             }
 
             public Element Element { get { return this.element; } }
-
             public override string Name { get { return "Type"; } }
         }
 

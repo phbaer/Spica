@@ -24,6 +24,8 @@ namespace Spica
         protected IList<string> ns = null;
         protected IList<Element> elements = null;
 
+		protected static TypeMap type_map = null;
+
         public string Input     { get { return this.input; } }
 
         public long TimeParse   { get { return this.time_parse; } }
@@ -207,6 +209,12 @@ namespace Spica
                     break;
             }
         }
+
+		public static TypeMap Map
+		{
+			set { type_map = value; }
+			get { return type_map; }
+		}
 
         public override string ToString()
         {

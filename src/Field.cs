@@ -68,6 +68,30 @@ namespace Spica
             get { return (this.type != -1); }
         }
 
+		public string FieldType
+		{
+			get
+			{
+				if (this.type != -1)
+				{
+					return SpicaML.Map.GetNativeType(TypeString(this.type));
+				}
+				return this.typename;
+			}
+		}
+
+		public string DefaultValue
+		{
+			get
+			{
+				if (this.type != -1)
+				{
+					return SpicaML.Map.GetDefaultValue(TypeString(this.type));
+				}
+				return SpicaML.Map.GetDefaultValue("default");
+			}
+		}
+
         internal override bool Resolved
         {
             get { return ((this.type != -1) || (this.element != null)); }

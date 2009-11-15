@@ -42,7 +42,11 @@ namespace Spica
     {
 		protected const string GENERATOR_NAME = "aastra2";
 		protected const string GENERATOR_VERSION = "1.9.0";
-		protected const string GENERATOR_COPYRIGHT = "2005-2008 DAS-Lab, Kassel University. 2009 DFKI RIC Bremen, Germany.";
+		protected static readonly string[] GENERATOR_COPYRIGHT = {
+			"2009 Spica Robotics Project (http://spica-robotics.net/)",
+			"2009 DFKI RIC Bremen (http://robotik.dfki-bremen.de/)",
+			"2005-2009 DAS-Lab, University of Kassel (http://das-lab.net/)"
+		};
 		protected const string GENERATOR_ID = GENERATOR_NAME + "/" + GENERATOR_VERSION;
 
         protected bool show_stats = false;
@@ -86,14 +90,17 @@ namespace Spica
 
         protected struct TemplateInfo
         {
-            public TemplateInfo(string ext, StringTemplateGroup stg)
+            public TemplateInfo(string ext, TypeMap type_map, StringTemplateGroup stg)
             {
                 extension = ext;
+				map = type_map;
                 group = stg;
             }
 
             public StringTemplate GetTemplate(Element element, string filename)
             {
+				SpicaML.Map = map;
+
                 StringTemplate template = (StringTemplate)group.GetInstanceOf("main");
                 template.PassThroughAttributes = true;
                 template.SetAttribute("e", element);
@@ -118,8 +125,20 @@ namespace Spica
             }
 
             public string extension;
+			public TypeMap map;
             public StringTemplateGroup group;
         }
+
+		protected void PrintVersionInformation()
+		{
+			Console.WriteLine("{0} {1}, {2}", GENERATOR_NAME, GENERATOR_VERSION, GENERATOR_COPYRIGHT);
+			Debug.WriteLine("Root directory:     {0}", this.root_path);
+			Debug.WriteLine("Template directory: {0}", this.template_path);
+			if (this.output_path != null)
+			{
+				Debug.WriteLine("Output directory:   {0}", this.output_path);
+			}
+		}
 
 		public Aastra(string[] args)
         {
@@ -140,12 +159,12 @@ namespace Spica
             a.SetOption("?flat", "Do not store generated code in type-secific subdirectories (enum, struct, module)");
             a.SetOption("?verbose", "Be verbose, output everything");
             a.SetOption("?quiet", "Suppress all output");
-		
+
 			// Consume the arguments
 			try {
 				a.Consume(args);
 			} catch (Exception) {
-				Console.WriteLine("{0} {1}, {2}", GENERATOR_NAME, GENERATOR_VERSION, GENERATOR_COPYRIGHT);
+				PrintVersionInformation();
 				Console.Error.Write(a.ToString());
 				Debug.WriteLine("Add one or more specification files");
 				Environment.Exit(1);
@@ -153,7 +172,7 @@ namespace Spica
 
 			// Check the parameter count
 			if (a.GetParameters().Count < 1) {
-				Console.WriteLine("{0} {1}, {2}", GENERATOR_NAME, GENERATOR_VERSION, GENERATOR_COPYRIGHT);
+				PrintVersionInformation();
 				Console.Error.Write(a.ToString());
 				Debug.WriteLine("No input file given!");
 				Debug.WriteLine("And one or more specification files");
@@ -189,7 +208,7 @@ namespace Spica
 
 			if (!quiet)
             {
-				Console.WriteLine("{0} {1}, {2}", GENERATOR_NAME, GENERATOR_VERSION, GENERATOR_COPYRIGHT);
+				PrintVersionInformation();
 			}
 
             DateTime overall_start = DateTime.UtcNow;
@@ -251,14 +270,7 @@ namespace Spica
 			}
             catch (Exception e)
             {
-                int depth = 0;
-
-                Debug.WriteLine("({0}) {1}", depth++, e.Message);
-               
-                while ((e = e.InnerException) != null)
-                {
-                    Debug.WriteLine("({0}) {1}", depth++, e.Message);
-                }
+        		DisplayException(e);
 			}
 
             DateTime overall_end = DateTime.UtcNow;
@@ -321,13 +333,13 @@ namespace Spica
         protected void DeterminePaths()
         {
             // Get path for templates
-            this.root_path = Environment.GetEnvironmentVariable("AASTRA_ROOT");
+            this.root_path = Environment.GetEnvironmentVariable("SPICA_ROOT");
 
             // Environment variable not set, search relative to the assembly path
             if (this.root_path == null)
             {
                 this.root_path = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
-                this.root_path = Path.Combine(this.root_path, "../Spica/aastra/");
+                this.root_path = Path.Combine(this.root_path, "..");
             }
 
             // Sanitise path
@@ -376,6 +388,9 @@ namespace Spica
             {
                 string path = Path.Combine(this.template_path, t);
 
+				// Load type mapping
+				TypeMap type_map = new TypeMap(path);
+
                 // Get available templates and extensions
                 IList<string> files = Directory.GetFiles(path, "*.stg");
 
@@ -390,6 +405,8 @@ namespace Spica
                 {
                     string filename = Path.GetFileNameWithoutExtension(file);
                     int dot = filename.LastIndexOf('.');
+
+					Console.WriteLine("---> " + filename);
 
                     string name = filename.Substring(0, dot);
                     string ext = filename.Substring(dot + 1, filename.Length - (dot + 1));
@@ -427,7 +444,7 @@ namespace Spica
                             {
                                 string tpl_name = String.Format("{0}.{1}", e.TypeName, ext);
 
-                                ti.Add(new TemplateInfo(ext, StringTemplateGroup.LoadGroup(tpl_name)));
+                                ti.Add(new TemplateInfo(ext, type_map, StringTemplateGroup.LoadGroup(tpl_name)));
                             }
                             catch (Exception ex) { DisplayException(ex); }
                         }
@@ -545,7 +562,7 @@ namespace Spica
                             FileStream fso = File.OpenRead(fn);
                             byte[] data_read = new byte[fso.Length];
         
-                            fso.Read(data_read, 0, data.Length);
+                            fso.Read(data_read, 0, (int)fso.Length);
                             fso.Close();
         
                             uint hash1 = ComputeHash(data);
@@ -571,7 +588,7 @@ namespace Spica
         protected void DisplayException(Exception e)
         {
             int depth = 0;
-            Debug.WriteLine("({0}) {1}", depth++, e.Message);
+            Debug.WriteLine("({0}) {1}", depth++, e);
             
             while ((e = e.InnerException) != null)
             {
