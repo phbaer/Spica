@@ -18,13 +18,16 @@ options { language = CSharp2; output = AST; }
 
 // Entrypoint for Aastra.
 model
-	:	( model_namespace | model_include )* ( struct_spec | flow_spec )*
+	:	( model_namespace | model_include | model_vendor )* ( struct_spec | flow_spec )*
 	;
 
 // Grammar rules for the global SpicaML model structure
 model_namespace
 	:	NAMESPACE misc_id ( '.' misc_id )* ';'
 		-> ^( NAMESPACE misc_id+ )
+	;
+model_vendor
+	:	VENDOR T_STRING ';'
 	;
 model_include
 @init {
@@ -300,7 +303,7 @@ misc_id
 		ANNOTATION | VECTOR | VIEW | DMC | RINGBUFFER | QUEUE |
 		MODULE | PUB | SUB | PUBDEF | SUBDEF | ANNOUNCE | STATIC | FILTER | CALL |
 		FUNCTION | VARIABLE | VALUE | ARGS | EALL | ASSIGN | BODY |
-		NAME | IDENTIFIER | GROUP | TYPENAME | NAMESPACE | SCHEME |
+		NAME | IDENTIFIER | GROUP | TYPENAME | NAMESPACE | SCHEME | VENDOR |
 		OTO | OTMS | OTMPS | PEERS | DEFINE | CARD | PROTO | SPEC | NOSPEC |ID
 	;
 misc_id_all
@@ -344,6 +347,7 @@ ADDRESS    : 'address'    ; EOL       : ';'         ; TYPE      : 'type'       ;
 SUBEXDEF   : 'subexdef'   ; CARD      : 'card'      ; PROTO     : 'proto'      ;
 RANGE      : '-'          ; SPEC      : 'spec'      ; NOSPEC    : 'nospec'     ;
 DST        : 'dst'        ; FIELDSPEC : 'fieldspec' ; FIXED     : 'fixed'      ;
+VENDOR     : 'vendor'     ;
 
 fragment UINT
 	:	( '0'..'9' )+ ;
