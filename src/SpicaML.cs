@@ -26,6 +26,8 @@ namespace Spica
 
 		protected static TypeMap type_map = null;
 
+		protected string vendor = null;
+
         public string Input     { get { return this.input; } }
 
         public long TimeParse   { get { return this.time_parse; } }
@@ -35,6 +37,7 @@ namespace Spica
         public IList<string>  Namespace { get { return this.ns; } }
         public ITree          AST       { get { return this.tree; } }
         public IList<Element> Elements  { get { return this.elements; } }
+		public string         CurrentVendor { get { return this.vendor; } }
 
 		public IList<Element> Parse(string input)
 		{
@@ -154,6 +157,17 @@ namespace Spica
         {
             switch (node.Type)
             {
+				case SpicaMLLexer.VENDOR:
+					{
+						if (node.ChildCount != 1)
+						{
+							throw new CException("Unable to extract vendor in {0}!", filename);
+						}
+
+						this.vendor = node.GetChild(0).Text;
+					}
+					break;
+
                 case SpicaMLLexer.STRUCT:
                     {
                         Structure s = new Structure(node, filename, Namespace);
