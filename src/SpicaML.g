@@ -11,7 +11,11 @@
 // 2006-2009 by Carpe Noctem Robotic Soccer
 // Distributed Systems Group, Kassel University, Germany
 // http://carpenoctem.das-lab.net/
-
+//
+// 2009-07-25: Cleaned up SpicaML
+// 2009-11-30: Compatibility for ROS messages (structs)
+//  * Added new datatypes float32 (float) and float64 (double)
+//  * Added new datatypes time and duration (each one is composed of two 32-bit ints, sec/nsec)
 
 grammar SpicaML;
 options { language = CSharp2; output = AST; }
@@ -28,6 +32,7 @@ model_namespace
 	;
 model_vendor
 	:	VENDOR T_STRING ';'
+		-> ^( VENDOR T_STRING )
 	;
 model_include
 @init {
@@ -109,8 +114,8 @@ struct_block_field_default_value
 	;
 struct_block_field_array
 	:	(
-		 '[' ( T_INT ( ',' T_INT )* )? ']' -> ^( ARRAY T_INT* ) |
-		 '[]' -> ^( ARRAY )
+		 '[' T_INT ( ',' T_INT )* ']' -> ^( ARRAY T_INT+ ) |
+		 '[]' -> ^( ARRAY ) 
 		)
 	;
 
@@ -307,13 +312,13 @@ misc_id
 		OTO | OTMS | OTMPS | PEERS | DEFINE | CARD | PROTO | SPEC | NOSPEC |ID
 	;
 misc_id_all
-	:	misc_id | BOOL | UINT8 | UINT16 | UINT32 | UINT64 | INT8 |
-		INT16 | INT32 | INT64 | FLOAT | DOUBLE | STRING | RANGE | EOL
+	:	misc_id | misc_id_prim | RANGE | EOL
 	;
 misc_id_prim
 	:	(
 		 BOOL | UINT8 | UINT16 | UINT32 | UINT64 | INT8 | INT16 |
-		 INT32 | INT64 | FLOAT | DOUBLE | FIXED | STRING | ADDRESS
+		 INT32 | INT64 | FLOAT | DOUBLE | FLOAT32 | FLOAT64 | FIXED |
+		 TIME | DURATION | STRING
 		)
 	;
 misc_version
@@ -343,11 +348,12 @@ BOOL       : 'bool'       ; UINT8     : 'uint8'     ; UINT16    : 'uint16'     ;
 UINT32     : 'uint32'     ; UINT64    : 'uint64'    ; INT8      : 'int8'       ;
 INT16      : 'int16'      ; INT32     : 'int32'     ; INT64     : 'int64'      ;
 FLOAT      : 'float'      ; DOUBLE    : 'double'    ; STRING    : 'string'     ;
-ADDRESS    : 'address'    ; EOL       : ';'         ; TYPE      : 'type'       ;
+FLOAT32    : 'float32'    ; FLOAT64   : 'float64'   ; TIME      : 'time'       ;
+DURATION   : 'duration'   ; EOL       : ';'         ; TYPE      : 'type'       ;
 SUBEXDEF   : 'subexdef'   ; CARD      : 'card'      ; PROTO     : 'proto'      ;
 RANGE      : '-'          ; SPEC      : 'spec'      ; NOSPEC    : 'nospec'     ;
 DST        : 'dst'        ; FIELDSPEC : 'fieldspec' ; FIXED     : 'fixed'      ;
-VENDOR     : 'vendor'     ;
+VENDOR     : 'vendor'     ; ADDRESS   : 'address'   ;
 
 fragment UINT
 	:	( '0'..'9' )+ ;
