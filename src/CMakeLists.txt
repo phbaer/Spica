@@ -32,7 +32,7 @@ set(Aastra_GRAMMAR_SRC
     "${CMAKE_CURRENT_BINARY_DIR}/${Aastra_GRAMMAR}Lexer.cs"
     "${CMAKE_CURRENT_BINARY_DIR}/${Aastra_GRAMMAR}Parser.cs")
 
-file(GLOB Aastra_SRC *.cs)
+file(GLOB Aastra_SRC *.cs ROS/*.cs)
 
 # Generate parser
 add_custom_command(

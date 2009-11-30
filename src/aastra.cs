@@ -38,10 +38,12 @@ using Castor.Dynamic;
 
 namespace Spica
 {
+	using ROS;
+
     public class Aastra
     {
 		protected const string GENERATOR_NAME = "aastra2";
-		protected const string GENERATOR_VERSION = "1.9.0";
+		protected const string GENERATOR_VERSION = "1.9.1";
 		protected static readonly string[] GENERATOR_COPYRIGHT = {
 			"2009 Spica Robotics Project (http://spica-robotics.net/)",
 			"2009 DFKI RIC Bremen (http://robotik.dfki-bremen.de/)",
@@ -131,7 +133,11 @@ namespace Spica
 
 		protected void PrintVersionInformation()
 		{
-			Console.WriteLine("{0} {1}, {2}", GENERATOR_NAME, GENERATOR_VERSION, GENERATOR_COPYRIGHT);
+			Console.WriteLine("Spica Robotics {0} {1}", GENERATOR_NAME, GENERATOR_VERSION);
+			foreach (string copy in GENERATOR_COPYRIGHT)
+			{
+				Console.WriteLine("* {0}", copy);
+			}
 			Debug.WriteLine("Root directory:     {0}", this.root_path);
 			Debug.WriteLine("Template directory: {0}", this.template_path);
 			if (this.output_path != null)
@@ -156,6 +162,8 @@ namespace Spica
             a.SetOption("?show-enums", "Show extracted structures");
             a.SetOption("?show-modules", "Show extracted structures");
             a.SetOption("?show-stats", "Show statistics");
+			a.SetOption("?ros-messages", "Process messages defined in ROS");
+			a.SetOption("?ros-package-path!", "Path to ROS packages (will be searched recursively)");
             a.SetOption("?flat", "Do not store generated code in type-secific subdirectories (enum, struct, module)");
             a.SetOption("?verbose", "Be verbose, output everything");
             a.SetOption("?quiet", "Suppress all output");
@@ -163,9 +171,10 @@ namespace Spica
 			// Consume the arguments
 			try {
 				a.Consume(args);
-			} catch (Exception) {
+			} catch (Exception e) {
 				PrintVersionInformation();
 				Console.Error.Write(a.ToString());
+				Debug.WriteLine(e.Message);
 				Debug.WriteLine("Add one or more specification files");
 				Environment.Exit(1);
 			}
@@ -212,6 +221,18 @@ namespace Spica
 			}
 
             DateTime overall_start = DateTime.UtcNow;
+
+			if (a.OptionIsSet("ros-messages"))
+			{
+				ROS.ROS ros = new ROS.ROS(a.OptionIsSet("ros-messages"));
+
+				if (a.OptionIsSet("ros-package-path"))
+				{
+					ros.AddPackagePath(Path.GetFullPath(a.GetOptionValues("ros-package-path")[0]));
+				}
+
+				ros.Scan();
+			}
 
 			try
             {
