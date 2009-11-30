@@ -118,19 +118,24 @@ namespace Spica
 
             switch (type)
             {
-                case SpicaMLLexer.BOOL:    return "bool";
-                case SpicaMLLexer.INT8:    return "int8";
-                case SpicaMLLexer.INT16:   return "int16";
-                case SpicaMLLexer.INT32:   return "int32";
-                case SpicaMLLexer.INT64:   return "int64";
-                case SpicaMLLexer.UINT8:   return "uint8";
-                case SpicaMLLexer.UINT16:  return "uint16";
-                case SpicaMLLexer.UINT32:  return "uint32";
-                case SpicaMLLexer.UINT64:  return "uint64";
-                case SpicaMLLexer.FLOAT:   return "float";
-                case SpicaMLLexer.DOUBLE:  return "double";
-                case SpicaMLLexer.STRING:  return "string";
-                case SpicaMLLexer.ADDRESS: return "address";
+                case SpicaMLLexer.BOOL:     return "bool";
+                case SpicaMLLexer.INT8:     return "int8";
+                case SpicaMLLexer.INT16:    return "int16";
+                case SpicaMLLexer.INT32:    return "int32";
+                case SpicaMLLexer.INT64:    return "int64";
+                case SpicaMLLexer.UINT8:    return "uint8";
+                case SpicaMLLexer.UINT16:   return "uint16";
+                case SpicaMLLexer.UINT32:   return "uint32";
+                case SpicaMLLexer.UINT64:   return "uint64";
+                case SpicaMLLexer.FLOAT:    return "float32";
+                case SpicaMLLexer.FLOAT32:  return "float32";
+                case SpicaMLLexer.DOUBLE:   return "float64";
+                case SpicaMLLexer.FLOAT64:  return "float64";
+                case SpicaMLLexer.TIME:     return "time";
+                case SpicaMLLexer.DURATION: return "duration";
+                case SpicaMLLexer.STRING:   return "string";
+// Type "address" is no longer supported
+//                case SpicaMLLexer.ADDRESS: return "address";
             }
 
             return "undefined";
