@@ -1,3 +1,21 @@
+/*
+ * ROS support library
+ *
+ * 2009 Spica Robotics Project (http://spica-robotics.net/)
+ * 2009 DFKI RIC Bremen, Germany (http://dfki.de/robotik/)
+ *
+ * Author: Philipp A. Baer <ph@baer.im>
+ *
+ * The code is derived from the software contributed to Carpe Noctem by
+ * the Carpe Noctem Team.
+ *
+ * Licensed under the FreeBSD license (modified BSD license).
+ *
+ * You should have received a copy of the license along with this
+ * software. The license is also available online:
+ * http://spica-robotics.net/license.txt
+ */
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -6,26 +24,54 @@ using Castor;
 namespace Spica.ROS
 {
 
+	/**
+	 * ROS support class for Aastra.
+	 *
+	 * ROS introduced a quite flexible yet lean package management system that allows
+	 * developers to use readily available modules and contribute new ones. This is facilitated
+	 * by two concepts: packages and stacks.
+	 *
+	 * Packages may be drivers, libraries, utilities, or other pieces of software that are
+	 * meant to be used by/useful for robotic systems. For each package the relevant information
+	 * (description, author, license, ...) and build requirements (dependencies) are defined
+	 * in a so-called manifest file. It must be located in the root directory of that package.
+	 * Nesting packages is not allowed.
+	 *
+	 * Stacks are simply collections of packages, meant to simplify reuse and to ease exchange
+	 * of functionality. A stack manifest file in the root directory of the stack also delivers
+	 * the required information. Just as packages, stacks may not be nested.
+	 *
+	 * The ROS support library in Aastra is able to locate packages and stacks. Once the manifest
+	 * files have been loaded, available packages may be bowsed and passed to the Aastra processing
+	 * engine.
+	 *
+	 * ROS furthermore allows to defin messages and services. Messages in ROS are just the same
+	 * as messages in Spica, except that semantic annotations are not supported and ROS is not
+	 * aware of inheritance. Services are interfaces for remote procedure calls, i.e. remote
+	 * methods with a specific signature that accept argument and return an arbitrary result.
+	 *
+	 * Both concepts, i.e. messages and services, are mapped onto their Spica counterparts.
+	 * However, Spica is not yet aware of the concept of remote procedure calls. They are thus
+	 * mapped onto a simple message exchange pattern for now.
+	 */
 	public class ROS
 	{
+		// Set to true if ROS was found, false otherwise
 		protected bool enable_ros = false;
+		// Set to the ROS root directory ($ROS_ROOT)
 		protected string ros_root = null;
-
+		// Set to the ROS cache timeout if specified, 60s otehrwise ($ROS_CACHE_TIMEOUT)
 		protected long ros_cache_timeout = 60000;
 
+		// List of discovered ROS stacks
 		protected ModuleInfo<Stack> stacks = null;
-//		protected string stack_path_env = null;
-//		protected IList<string> stack_paths = null;
-//		protected List<Stack> stacks = null;
 		public IList<Stack> Stacks
 		{
 			get { return this.stacks.List; }
 		}
 
+		// List of discovered ROS packages
 		protected ModuleInfo<Package> packages = null;
-//		protected string package_path_env = null;
-//		protected IList<string> package_paths = null;
-//		protected List<Package> packages = null;
 		public IList<Package> Packages
 		{
 			get { return this.packages.List; }
@@ -33,11 +79,6 @@ namespace Spica.ROS
 
 		public ROS(bool enable_ros)
 		{
-//			this.stack_paths = new List<string>();
-//			this.stacks = new List<Stack>();
-
-//			this.package_paths = new List<string>();
-//			this.packages = new List<Package>();
 
 			if (enable_ros)
 			{
