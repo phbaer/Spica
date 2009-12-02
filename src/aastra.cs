@@ -224,7 +224,7 @@ namespace Spica
 
 			if (a.OptionIsSet("ros-messages"))
 			{
-				ROS.ROS ros = new ROS.ROS(a.OptionIsSet("ros-messages"));
+				ROS.ROS ros = new ROS.ROS();
 
 				if (a.OptionIsSet("ros-package-path"))
 				{

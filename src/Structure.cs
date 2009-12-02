@@ -13,6 +13,20 @@ namespace Spica
         protected ListDictionary<string, Structure> children = null;
         protected ListDictionary<string, Field> fields = null;
 
+        public Structure(string filename, IList<string[]> field_list) : base(filename)
+        {
+            this.supertypeNames = new List<string>();
+            this.supertypes = new ListDictionary<string, Structure>();
+            this.children = new ListDictionary<string, Structure>();
+            this.fields = new ListDictionary<string, Field>();
+
+            foreach (string[] field in field_list)
+            {
+                Field f = new Field(field, Filename);
+                this.fields.Add(field[2], f);
+            }
+        }
+
         public Structure(ITree node, string filename, IList<string> ns) : base(node, filename, ns)
         {
             if ((node == null) || (node.Type != SpicaMLLexer.STRUCT))

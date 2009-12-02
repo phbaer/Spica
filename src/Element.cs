@@ -20,7 +20,20 @@ namespace Spica
         private string filename = null;
 
         /**
-         * Default constructor. Used to pass the node to be processed and the
+         * Default constructor. May be used only for generating custom messages
+         * not derived from an ANTLR node (such as, e.g. ROS messages)
+         * @param filename The name of the file in which the node is defined
+         */
+        public Element(string filename)
+        {
+            this.line = 0;
+            this.charpos = 0;
+            this.filename = filename;
+            this.ns = new List<string>();
+        }
+
+        /**
+         * Constructor. Used to pass the node to be processed and the
          * filename in which this node is defined.
          * @param node The node to be processed
          * @param filename The name of the file in which the node is defined
@@ -140,6 +153,43 @@ namespace Spica
 
             return "undefined";
         }
+
+        /**
+         * Maps a string to a primitive type id
+         * @param type The type string
+         * @return primitive type as defined by the ANTLR grammar, -1 if an error occured
+         */
+        protected int TypeID(string type)
+        {
+            if (type == null)
+            {
+                return -1;
+            }
+
+            switch (type)
+            {
+                case "bool":     return SpicaMLLexer.BOOL;
+                case "int8":     return SpicaMLLexer.INT8;
+                case "int16":    return SpicaMLLexer.INT16;
+                case "int32":    return SpicaMLLexer.INT32;
+                case "int64":    return SpicaMLLexer.INT64;
+                case "uint8":    return SpicaMLLexer.UINT8;
+                case "uint16":   return SpicaMLLexer.UINT16;
+                case "uint32":   return SpicaMLLexer.UINT32;
+                case "uint64":   return SpicaMLLexer.UINT64;
+                case "float":    return SpicaMLLexer.FLOAT;
+                case "float32":  return SpicaMLLexer.FLOAT32;
+                case "double":   return SpicaMLLexer.DOUBLE;
+                case "float64":  return SpicaMLLexer.FLOAT64;
+                case "time":     return SpicaMLLexer.TIME;
+                case "duration": return SpicaMLLexer.DURATION;
+                case "string":   return SpicaMLLexer.STRING;
+            }
+
+            return -1;
+        }
+
+
 
         /**
          * Returns the text of a TYPENAME node of an ANTLR AST tree

@@ -1,3 +1,21 @@
+/*
+ * ROS support library: Stack class
+ *
+ * 2009 Spica Robotics Project (http://spica-robotics.net/)
+ * 2009 DFKI RIC Bremen, Germany (http://dfki.de/robotik/)
+ *
+ * Author: Philipp A. Baer <philipp.baer at dfki.de>
+ *
+ * The code is derived from the software contributed to Carpe Noctem by
+ * the Carpe Noctem Team.
+ *
+ * Licensed under the FreeBSD license (modified BSD license).
+ *
+ * You should have received a copy of the license along with this
+ * software. The license is also available online:
+ * http://spica-robotics.net/license.txt
+ */
+
 using System;
 using System.Xml;
 
@@ -6,79 +24,31 @@ namespace Spica.ROS
 
 	public class Stack : Module
 	{
-		protected bool in_stack = false;
-
-		protected string description = null;
-		protected string description_brief = null;
-		protected string license = null;
-		protected string license_url = null;
-		protected string author = null;
-
 		public Stack() : base() {}
 		public Stack(string dir) : base(dir) {}
 
-		public override string Manifest
+		public override string ManifestFile
 		{
 			get { return "stack.xml"; }
 		}
 
-		public override string Cache
+		public override string CacheFile
 		{
 			get { return ".rosstack_cache"; }
 		}
 
-		protected override void ProcessNode(XmlTextReader reader)
+		protected override void ProcessingHook(XmlTextReader reader)
 		{
-			if (reader.NodeType != XmlNodeType.Element) return;
+			string name = reader.Name.ToLower();
 
-			switch (reader.Name.ToLower())
+			// Extract dependencies
+			if (name.Equals("depend"))
 			{
-				case "stack":
-					this.in_stack = true;
-					break;
-
-				case "description":
-					{
-						if (!this.in_stack) break;
-
-
-						// Get brief description
-						if (reader.MoveToAttribute("brief"))
-						{
-							this.description_brief = reader.Value;
-						}
-
-						// Get description
-						this.description = reader.ReadString();
-					}
-					break;
-
-				case "author":
-					{
-						if (!this.in_stack) break;
-
-						// Get author
-						this.author = reader.ReadString();
-					}
-					break;
-
-				case "license":
-					{
-						if (!this.in_stack) break;
-
-						// Get license URL
-						if (reader.MoveToAttribute("url"))
-						{
-							this.license_url = reader.Value;
-						}
-
-						// Get licence
-						this.license = reader.ReadString();
-					}
-					break;
+				if (reader.MoveToAttribute("stack"))
+				{
+					this.dep_names.Add(reader.Value);
+				}
 			}
-
-//			Console.WriteLine("{0}: {1}", this.path, reader.Name);
 		}
 	}
 }
