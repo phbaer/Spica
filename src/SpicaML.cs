@@ -51,7 +51,8 @@ namespace Spica
             this.ns = new List<string>();
             this.elements = new List<Element>();
 
-            try {
+            try
+            {
                 DateTime parse_start = DateTime.UtcNow;
                 SpicaMLParser.model_return r = parser.model();
                 DateTime parse_stop = DateTime.UtcNow;

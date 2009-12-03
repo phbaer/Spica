@@ -82,7 +82,7 @@ namespace Spica
             }
         }
 
-        public abstract string TypeName { get; }
+        public abstract string SpicaElementName { get; }
 
         /**
          * Property for accessing the element's hash.

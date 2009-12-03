@@ -74,7 +74,7 @@ namespace Spica
             }
         }
 
-        public override string TypeName
+        public override string SpicaElementName
         {
             get { return "ModuleSubscribe"; }
         }
@@ -159,7 +159,7 @@ namespace Spica
             }
         }
 
-        public override string TypeName
+        public override string SpicaElementName
         {
             get { return "ModulePublish"; }
         }
@@ -294,7 +294,7 @@ namespace Spica
             }
         }
 
-        public override string TypeName
+        public override string SpicaElementName
         {
             get { return "Module"; }
         }

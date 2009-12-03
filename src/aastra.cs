@@ -448,29 +448,29 @@ namespace Spica
                 {
                     foreach (Element e in sml.Elements)
                     {
-                        if (this.templates.ContainsKey(e.TypeName))
+                        if (this.templates.ContainsKey(e.SpicaElementName))
                         {
                             continue;
                         }
 
-                        if (!ext_map.ContainsKey(e.TypeName))
+                        if (!ext_map.ContainsKey(e.SpicaElementName))
                         {
-                            throw new CException("No template found for type {0}!", e.TypeName);
+                            throw new CException("No template found for type {0}!", e.SpicaElementName);
                         }
 
                         IList<TemplateInfo> ti = new List<TemplateInfo>();
-                        foreach (string ext in ext_map[e.TypeName])
+                        foreach (string ext in ext_map[e.SpicaElementName])
                         {
                             try
                             {
-                                string tpl_name = String.Format("{0}.{1}", e.TypeName, ext);
+                                string tpl_name = String.Format("{0}.{1}", e.SpicaElementName, ext);
 
                                 ti.Add(new TemplateInfo(ext, type_map, StringTemplateGroup.LoadGroup(tpl_name)));
                             }
                             catch (Exception ex) { DisplayException(ex); }
                         }
 
-                        this.templates.Add(e.TypeName, ti);
+                        this.templates.Add(e.SpicaElementName, ti);
                     }
                 }
             }
@@ -497,14 +497,14 @@ namespace Spica
                         try
                         {
                             // Load the template group specified by the entry point
-                            if (!this.templates.ContainsKey(e.TypeName))
+                            if (!this.templates.ContainsKey(e.SpicaElementName))
                             {
-                                throw new CException("Fatal error: Template {0} not loaded!", e.TypeName);
+                                throw new CException("Fatal error: Template {0} not loaded!", e.SpicaElementName);
                             }
 
-                            this.process_elements.Enqueue(new ElementInfo(t, this.templates[e.TypeName], e, sml.Input));
+                            this.process_elements.Enqueue(new ElementInfo(t, this.templates[e.SpicaElementName], e, sml.Input));
 
-                            count += this.templates[e.TypeName].Count;
+                            count += this.templates[e.SpicaElementName].Count;
                         }
                         catch (Exception ste) { DisplayException(ste); }
                     }
@@ -558,7 +558,7 @@ namespace Spica
                     // Create type-specific dir hierarchy
                     if (!this.output_flat)
                     {
-                        output = Path.Combine(output, ei.element.TypeName.ToLower());
+                        output = Path.Combine(output, ei.element.SpicaElementName.ToLower());
                     }
 
                     // Create directory if required

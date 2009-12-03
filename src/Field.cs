@@ -98,12 +98,12 @@ namespace Spica
             }
         }
 
-        public override string TypeName
+        public override string SpicaElementName
         {
             get { return "Field"; }
         }
 
-        public bool Primitive
+        public bool IsPrimitive
         {
             get { return (this.type != -1); }
         }

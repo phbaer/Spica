@@ -61,7 +61,7 @@ namespace Spica
             }
         }
 
-        public override string TypeName
+        public override string SpicaElementName
         {
             get { return "Enum"; }
         }
