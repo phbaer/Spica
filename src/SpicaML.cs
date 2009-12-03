@@ -11,8 +11,8 @@ using Castor;
 namespace Spica
 {
 
-	public class SpicaML
-	{
+    public class SpicaML
+    {
         protected string input = null;
 
         protected long time_parse = 0;
@@ -24,9 +24,9 @@ namespace Spica
         protected IList<string> ns = null;
         protected IList<Element> elements = null;
 
-		protected static TypeMap type_map = null;
+        protected static TypeMap type_map = null;
 
-		protected string vendor = null;
+        protected string vendor = null;
 
         public string Input     { get { return this.input; } }
 
@@ -34,13 +34,13 @@ namespace Spica
         public long TimeProcess { get { return this.time_process; } }
         public long TimeResolve { get { return this.time_resolve; } }
 
-        public IList<string>  Namespace { get { return this.ns; } }
-        public ITree          AST       { get { return this.tree; } }
-        public IList<Element> Elements  { get { return this.elements; } }
-		public string         CurrentVendor { get { return this.vendor; } }
+        public IList<string>  Namespace     { get { return this.ns; } }
+        public ITree          AST           { get { return this.tree; } }
+        public IList<Element> Elements      { get { return this.elements; } }
+        public string         CurrentVendor { get { return this.vendor; } }
 
-		public IList<Element> Parse(string input)
-		{
+        public IList<Element> Parse(string input)
+        {
             this.input = input;
 
             ICharStream instr = new ANTLRFileStream(input);
@@ -118,7 +118,7 @@ namespace Spica
                             this.time_parse + this.time_process + this.time_resolve);
 
             return this.elements;
-		}
+        }
 
         protected void ProcessTree(ITree node, string filename)
         {
@@ -157,16 +157,16 @@ namespace Spica
         {
             switch (node.Type)
             {
-				case SpicaMLLexer.VENDOR:
-					{
-						if (node.ChildCount != 1)
-						{
-							throw new CException("Unable to extract vendor in {0}!", filename);
-						}
+                case SpicaMLLexer.VENDOR:
+                    {
+                        if (node.ChildCount != 1)
+                        {
+                            throw new CException("Unable to extract vendor in {0}!", filename);
+                        }
 
-						this.vendor = node.GetChild(0).Text;
-					}
-					break;
+                        this.vendor = node.GetChild(0).Text;
+                    }
+                    break;
 
                 case SpicaMLLexer.STRUCT:
                     {
@@ -224,11 +224,11 @@ namespace Spica
             }
         }
 
-		public static TypeMap Map
-		{
-			set { type_map = value; }
-			get { return type_map; }
-		}
+        public static TypeMap Map
+        {
+            set { type_map = value; }
+            get { return type_map; }
+        }
 
         public override string ToString()
         {
