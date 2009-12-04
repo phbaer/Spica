@@ -22,7 +22,11 @@ options { language = CSharp2; output = AST; }
 
 // Entrypoint for Aastra.
 model
-	:	( model_namespace | model_include )* ( struct_spec | flow_spec )*
+	:	(
+		 model_namespace model_include* |
+		 model_include+ model_namespace model_include* |
+		 model_include*
+		) ( struct_spec | flow_spec )*
 	;
 
 // Grammar rules for the global SpicaML model structure
@@ -56,10 +60,11 @@ model_include
 
                 try
                 {
+                    Castor.Trace.WriteLine("Reading {0}", file);
                     ICharStream inner_instr = new ANTLRFileStream(path);
                     SpicaMLLexer inner_lex = new SpicaMLLexer(inner_instr);
                     CommonTokenStream inner_tokens = new CommonTokenStream(inner_lex);
-                    SpicaMLParser inner_parser = new SpicaMLParser(inner_tokens);
+                    SpicaMLParser inner_parser = new Spica.SpicaMLParserReportError(inner_tokens);
                     includetree = (CommonTree)(inner_parser.model().Tree);
                 }
                 catch (Exception e)
@@ -114,7 +119,11 @@ struct_block_field_default_value
 		-> ^( DEFAULT misc_value )
 	;
 struct_block_field_array
-	:	'[' ( T_INT ( ',' T_INT )* )? ']' -> ^( ARRAY T_INT* )
+	:	'[' ( struct_block_field_array_number ( ',' struct_block_field_array_number )* )? ']'
+		-> ^( ARRAY struct_block_field_array_number* )
+	;
+struct_block_field_array_number
+	:	(  T_SINT | T_UINT )
 	;
 
 // Grammar rules for the data flow specification
@@ -278,7 +287,7 @@ misc_ann_kv_generic
 	;
 misc_value
 	:	(
-		 T_UINT | T_INT | T_FLOAT | T_TIME | T_STRING | TRUE | FALSE |
+		 T_UINT | T_SINT | T_FLOAT | T_TIME | T_STRING | TRUE | FALSE |
 		 misc_urn_id | misc_type
 		)
 	;
@@ -306,7 +315,7 @@ misc_id
 		ANNOTATION | VECTOR | VIEW | DMC | RINGBUFFER | QUEUE |
 		MODULE | PUB | SUB | PUBDEF | SUBDEF | ANNOUNCE | STATIC | FILTER | CALL |
 		FUNCTION | VARIABLE | VALUE | ARGS | EALL | ASSIGN | BODY |
-		NAME | IDENTIFIER | GROUP | TYPENAME | NAMESPACE | SCHEME | VENDOR |
+		NAME | IDENTIFIER | GROUP | TYPENAME | NAMESPACE | SCHEME | 
 		OTO | OTMS | OTMPS | PEERS | DEFINE | CARD | PROTO | SPEC | NOSPEC |ID
 	;
 misc_id_all
@@ -351,22 +360,23 @@ DURATION   : 'duration'   ; EOL       : ';'         ; TYPE      : 'type'       ;
 SUBEXDEF   : 'subexdef'   ; CARD      : 'card'      ; PROTO     : 'proto'      ;
 RANGE      : '-'          ; SPEC      : 'spec'      ; NOSPEC    : 'nospec'     ;
 DST        : 'dst'        ; FIELDSPEC : 'fieldspec' ; FIXED     : 'fixed'      ;
-VENDOR     : 'vendor'     ; ADDRESS   : 'address'   ; PACKAGE   : 'package'    ;
+ADDRESS    : 'address'    ; PACKAGE   : 'package'    ;
 
 ID
 	:	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 	;
-fragment T_UINT
+T_UINT
 	:	( '0'..'9' )+ ;
 
-fragment T_SINT
+T_SINT
 	:	('-'|'+') T_UINT
 	;
-T_INT
-	:	( T_SINT | T_UINT )
-	;
+//T_UINT2 :	 T_UINT;
+//T_INT
+//	:	( T_SINT | T_UINT )
+//	;
 T_FLOAT
-	:	( T_INT '.' T_UINT? | '.' T_UINT)
+	:	( ( T_UINT | T_SINT ) '.' T_UINT? | '.' T_UINT)
 	;
 T_STRING
 	:	'"' (ESC | ~('\\'|'"'))* '"'
