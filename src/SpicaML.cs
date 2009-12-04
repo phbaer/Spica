@@ -46,7 +46,7 @@ namespace Spica
             ICharStream instr = new ANTLRFileStream(input);
             SpicaMLLexer lex = new SpicaMLLexer(instr);
             CommonTokenStream tokens = new CommonTokenStream(lex);
-            SpicaMLParser parser = new SpicaMLParser(tokens);
+            SpicaMLParser parser = new SpicaMLParserReportError(tokens);
 
             this.ns = new List<string>();
             this.elements = new List<Element>();
@@ -158,17 +158,6 @@ namespace Spica
         {
             switch (node.Type)
             {
-                case SpicaMLLexer.VENDOR:
-                    {
-                        if (node.ChildCount != 1)
-                        {
-                            throw new CException("Unable to extract vendor in {0}!", filename);
-                        }
-
-                        this.vendor = node.GetChild(0).Text;
-                    }
-                    break;
-
                 case SpicaMLLexer.STRUCT:
                     {
                         Structure s = new Structure(node, filename, null, Namespace);

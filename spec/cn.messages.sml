@@ -1,5 +1,3 @@
-vendor "spica-robotics";
-
 struct Container {
 }
 

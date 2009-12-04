@@ -427,8 +427,6 @@ namespace Spica
                     string filename = Path.GetFileNameWithoutExtension(file);
                     int dot = filename.LastIndexOf('.');
 
-                    Console.WriteLine("---> " + filename);
-
                     string name = filename.Substring(0, dot);
                     string ext = filename.Substring(dot + 1, filename.Length - (dot + 1));
 
