@@ -22,17 +22,13 @@ options { language = CSharp2; output = AST; }
 
 // Entrypoint for Aastra.
 model
-	:	( model_namespace | model_include | model_vendor )* ( struct_spec | flow_spec )*
+	:	( model_namespace | model_include )* ( struct_spec | flow_spec )*
 	;
 
 // Grammar rules for the global SpicaML model structure
 model_namespace
 	:	NAMESPACE misc_id ( '.' misc_id )* ';'
 		-> ^( NAMESPACE misc_id+ )
-	;
-model_vendor
-	:	VENDOR T_STRING ';'
-		-> ^( VENDOR T_STRING )
 	;
 model_include
 @init {
@@ -102,7 +98,12 @@ struct_block_field
 		-> ^( FIELD struct_block_field_type struct_block_field_name )
 	;
 struct_block_field_type
-	:	misc_type struct_block_field_array?
+	:	struct_block_field_type_package? misc_type struct_block_field_array?
+		-> struct_block_field_type_package? misc_type struct_block_field_array?
+	;
+struct_block_field_type_package
+	:	misc_id ( '.' | '/' )
+		-> ^( PACKAGE misc_id ) 
 	;
 struct_block_field_name
 	:	misc_id_all struct_block_field_default_value? misc_ann? ';'
@@ -113,10 +114,7 @@ struct_block_field_default_value
 		-> ^( DEFAULT misc_value )
 	;
 struct_block_field_array
-	:	(
-		 '[' T_INT ( ',' T_INT )* ']' -> ^( ARRAY T_INT+ ) |
-		 '[]' -> ^( ARRAY ) 
-		)
+	:	'[' ( T_INT ( ',' T_INT )* )? ']' -> ^( ARRAY T_INT* )
 	;
 
 // Grammar rules for the data flow specification
@@ -353,28 +351,28 @@ DURATION   : 'duration'   ; EOL       : ';'         ; TYPE      : 'type'       ;
 SUBEXDEF   : 'subexdef'   ; CARD      : 'card'      ; PROTO     : 'proto'      ;
 RANGE      : '-'          ; SPEC      : 'spec'      ; NOSPEC    : 'nospec'     ;
 DST        : 'dst'        ; FIELDSPEC : 'fieldspec' ; FIXED     : 'fixed'      ;
-VENDOR     : 'vendor'     ; ADDRESS   : 'address'   ;
-
-fragment UINT
-	:	( '0'..'9' )+ ;
+VENDOR     : 'vendor'     ; ADDRESS   : 'address'   ; PACKAGE   : 'package'    ;
 
 ID
 	:	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 	;
-T_UINT
-	:	UINT
+fragment T_UINT
+	:	( '0'..'9' )+ ;
+
+fragment T_SINT
+	:	('-'|'+') T_UINT
 	;
 T_INT
-	:	('-'|'+')? UINT
+	:	( T_SINT | T_UINT )
 	;
 T_FLOAT
-	:	( T_INT '.' UINT? | '.' UINT)
+	:	( T_INT '.' T_UINT? | '.' T_UINT)
 	;
 T_STRING
 	:	'"' (ESC | ~('\\'|'"'))* '"'
 	;
 T_TIME
-	:	( ( T_INT | T_FLOAT ) ( 'm' | 's' | 'ms' | 'us' | 'ns' ) )
+	:	( ( T_SINT | T_UINT | T_FLOAT ) ( 'm' | 's' | 'ms' | 'us' | 'ns' ) )
 	;
 
 protected
