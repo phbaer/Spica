@@ -56,7 +56,7 @@ add_custom_target(
     Aastra
     ALL DEPENDS ${Aastra_OUT})
 
-file(GLOB AastraDump_SRC dump/*.cs)
+file(GLOB AastraDump_SRC dump/*.cs ${Aastra_GRAMMAR}ParserReportError.cs )
 
 # Compile aastradump
 add_custom_command(
