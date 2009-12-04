@@ -28,7 +28,7 @@ class <e.Name><if(e.SuperTypes.Count)> : public <e.SuperTypes.Keys; separator=",
 {
 	private:
 <e.Fields.Values:{f|
-		<f.FieldType><if(f.Primitive)>Ptr<endif> __field_<f.Name>;
+		<f.FieldType><if(f.IsPrimitive)>Ptr<endif> __field_<f.Name>;
 }>
 
 	public:
@@ -37,7 +37,7 @@ class <e.Name><if(e.SuperTypes.Count)> : public <e.SuperTypes.Keys; separator=",
 			__field_<f.Name>(<f.DefaultValue>)}; separator=",\n"><endif>
 
 		{
-<e.Fields.Values:{f|<if(!f.Primitive)>
+<e.Fields.Values:{f|<if(!f.IsPrimitive)>
 			this->__field_<f.Name> = <f.FieldType>Ptr(new <f.FieldType>);<endif>
 }>
 		}
@@ -51,7 +51,7 @@ class <e.Name><if(e.SuperTypes.Count)> : public <e.SuperTypes.Keys; separator=",
 		 * Getter for <f>
 		 * @return Value (<f.FieldType>) of the structure variable <f.Name>
 		 */
-		inline <f.FieldType><if(!f.Primitive)>Ptr<endif> &get<f.Name; format="fupper">()
+		inline <f.FieldType><if(!f.IsPrimitive)>Ptr<endif> &get<f.Name; format="fupper">()
 		{
 			return this->__field_<f.Name>;
 		}
@@ -60,7 +60,7 @@ class <e.Name><if(e.SuperTypes.Count)> : public <e.SuperTypes.Keys; separator=",
 		 * Setter for <f>
 		 * @param value Value (<f.FieldType>) for the structure variable <f.Name>
 		 */
-		inline void set<f.Name; format="fupper">(<f.FieldType><if(!f.Primitive)>Ptr&<endif> value)
+		inline void set<f.Name; format="fupper">(<f.FieldType><if(!f.IsPrimitive)>Ptr&<endif> value)
 		{
 			this->__field_<f.Name> = value;
 		}

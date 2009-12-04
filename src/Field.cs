@@ -7,28 +7,28 @@ namespace Spica
 {
     public class Field : Element
     {
-        protected int type = -1;
-        protected Element element = null;
-        protected string typename = null;
-        protected string package = null;
-        protected string field_value = null;
+        private int type = -1;
+        private Element element = null;
+        private string typename = null;
+        private string field_value = null;
+        private Structure structure = null;
 
         // array < 0: this type is no array
         // array = 0: this type is a dynamic array
         // array > 0: this type is an array with the given size
-        protected int array = -1;
+        private int array = -1;
 
         /**
          * Default constsructor for custom fields.
          * @param field An array of field parameters (package, type, name, array/size, value)
          * @param filename The name of the file in which the field is defined
          */
-        public Field(string[] field, string filename) : base(filename)
+        public Field(Structure structure, string filename, string[] field) : base(filename, field[0])
         {
-            this.package = field[0];
             this.typename = field[1];
             this.type = TypeID(field[1]);
             this.element = null;
+            this.structure = structure;
 
             if (field[3] == null)
             {
@@ -59,8 +59,10 @@ namespace Spica
          * @param filename The name of the file in which the node is defined
          * @return A new instance of a Field
          */
-        public Field(ITree node, string filename, IList<string> ns) : base(node, filename, ns)
+        public Field(ITree node, Structure structure, string filename, IList<string> ns) : base(node, filename, null, ns)
         {
+            this.structure = structure;
+
             // Sanity check
             if ((node == null) || (node.Type != SpicaMLLexer.FIELD))
             {
@@ -78,6 +80,10 @@ namespace Spica
 
                     case SpicaMLLexer.NAME: // Should be childs 1..n
                         Name = GetName(node.GetChild(i));
+                        break;
+
+                    case SpicaMLLexer.PACKAGE:
+                        Package = node.GetChild(i).Text;
                         break;
                         
                     default: // Should be child 0 for primitive types
@@ -101,6 +107,11 @@ namespace Spica
         public override string SpicaElementName
         {
             get { return "Field"; }
+        }
+
+        public Structure Structure
+        {
+            get { return this.structure; }
         }
 
         public bool IsPrimitive
@@ -130,11 +141,6 @@ namespace Spica
                 }
                 return SpicaML.Map.GetDefaultValue("default");
             }
-        }
-
-        public string Package
-        {
-            get { return this.package; }
         }
 
         public bool IsArray
@@ -192,11 +198,12 @@ namespace Spica
             throw new CException("Unable to resolve field type '{0}'", this.typename);
         }
 
-        public override string ToString()
+        protected override void UpdateFullName()
         {
-            string typename = TypeString(this.type);
+            FullName = new List<string>(this.structure.FullName);
+            FullName.Add(Name);
 
-            return String.Format("{0} {1}", (typename == null ? this.typename : typename), Name);
+            FullNameString = this.structure.FullNameString + ":" + Name;
         }
     }
 }

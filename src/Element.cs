@@ -11,25 +11,37 @@ namespace Spica
     public abstract class Element
     {
         private string name = null;
+
+        private IList<string> fullname = null;
+        private string fullname_string = null;
+
         private uint id = 0;
 
+        private IList<string> root_ns = null;
         private IList<string> ns = null;
+        private string root_ns_string = null;
+        private string ns_string = null;
 
         private int line = 0;
         private int charpos = 0;
         private string filename = null;
 
+        private string package = null;
+
         /**
          * Default constructor. May be used only for generating custom messages
          * not derived from an ANTLR node (such as, e.g. ROS messages)
          * @param filename The name of the file in which the node is defined
+         * @param package The name of the package in which the node is defined
          */
-        public Element(string filename)
+        public Element(string filename, string package)
         {
             this.line = 0;
             this.charpos = 0;
             this.filename = filename;
-            this.ns = new List<string>();
+
+            RootNamespace = new List<string>();
+            Package = package;
         }
 
         /**
@@ -37,13 +49,17 @@ namespace Spica
          * filename in which this node is defined.
          * @param node The node to be processed
          * @param filename The name of the file in which the node is defined
+         * @param package The name of the package in which the node is defined
+         * @param ns The namespace of the element
          */
-        public Element(ITree node, string filename, IList<string> ns)
+        public Element(ITree node, string filename, string package, IList<string> ns)
         {
             this.line = node.Line;
             this.charpos = node.CharPositionInLine;
             this.filename = filename;
-            this.ns = ns;
+
+            RootNamespace = ns;
+            Package = package;
         }
 
        /**
@@ -55,12 +71,45 @@ namespace Spica
         }
 
         /**
-         * Property for accessing the namespace for the element.
+         * Property for accessing the root namespace of the element.
          */
-        public IList<string> Namespace
+        public IList<string> RootNamespace
         {
-            get { return this.ns; }
-            internal set { this.ns = value; }
+            get { return this.root_ns; }
+            private set
+            {
+                this.root_ns = value;
+
+                // Generate ns string
+                this.root_ns_string = "";
+                foreach (string s in this.root_ns)
+                {
+                    this.root_ns_string += '/';
+                    this.root_ns_string += s;
+                }
+            }
+        }
+
+        /**
+         * Property for accessing the package name
+         */
+        public string Package
+        {
+            get { return this.package; }
+            protected set
+            {
+                this.package = value;
+
+                // Set the namespace
+                this.ns = new List<string>(this.root_ns);
+                this.ns_string = this.root_ns_string;
+
+                if (this.package != null)
+                {
+                    this.ns.Add(this.package);
+                    this.ns_string += (value != null ? ("/" + value) : "");
+                }
+            }
         }
 
         /**
@@ -72,22 +121,60 @@ namespace Spica
             get { return this.name; }
             internal set
             {
-                if (value != null)
-                {
-                    Castor.Jenkins96 hash = new Castor.Jenkins96();
+                this.name = value;
 
-                    this.name = value;
-                    this.id = hash.ComputeHash(Encoding.ASCII.GetBytes(this.name));
-                }
+                UpdateFullName();
+
+                Castor.Jenkins96 hash = new Castor.Jenkins96();
+                this.id = hash.ComputeHash(Encoding.ASCII.GetBytes(this.fullname_string));
             }
         }
 
+        /**
+         * Property for accessing the full name of the element
+         */
+        public IList<string> FullName
+        {
+            get { return this.fullname; }
+            internal set { this.fullname = value; }
+        }
+
+        /**
+         * Property for accessing the full name of the element as a string
+         */
+        public string FullNameString
+        {
+            get { return this.fullname_string; }
+            internal set { this.fullname_string = value; }
+        }
+
+        public string RootNamespaceString
+        {
+            get { return this.root_ns_string; }
+        }
+
+        /**
+         * Property for accessing the full namespace of the element
+         */
+        public IList<string> Namespace
+        {
+            get { return this.ns; }
+        }
+
+        public string NamespaceString
+        {
+            get { return this.ns_string; }
+        }
+
+        /**
+         * Returns the name of the Spica element (Module, Struct, ...)
+         */
         public abstract string SpicaElementName { get; }
 
         /**
          * Property for accessing the element's hash.
          */
-        public uint Hash
+        public uint Id
         {
             get { return this.id; }
         }
@@ -243,7 +330,7 @@ namespace Spica
         public override bool Equals(object other)
         {
             return ((other != null) && (other is Element)
-                ? (Hash == (other as Element).Hash)
+                ? (Id == (other as Element).Id)
                 : false);
         }
 
@@ -253,8 +340,18 @@ namespace Spica
          */
         public override int GetHashCode()
         {
-            return (int)Hash;
+            return (int)Id;
         }
+
+        /**
+         * String representation of the current element
+         */
+        public override string ToString()
+        {
+            return String.Format("{0}({1}):{2}({3})", SpicaElementName, GetHashCode(), FullNameString, Id);
+        }
+
+        protected abstract void UpdateFullName();
     }
 }
 

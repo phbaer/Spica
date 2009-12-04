@@ -13,21 +13,23 @@ namespace Spica
         protected ListDictionary<string, Structure> children = null;
         protected ListDictionary<string, Field> fields = null;
 
-        public Structure(string filename, IList<string[]> field_list) : base(filename)
+        public Structure(string name, string filename, string package, IList<string[]> field_list) : base(filename, package)
         {
             this.supertypeNames = new List<string>();
             this.supertypes = new ListDictionary<string, Structure>();
             this.children = new ListDictionary<string, Structure>();
             this.fields = new ListDictionary<string, Field>();
 
+            Name = name;
+
             foreach (string[] field in field_list)
             {
-                Field f = new Field(field, Filename);
+                Field f = new Field(this, Filename, field);
                 this.fields.Add(field[2], f);
             }
         }
 
-        public Structure(ITree node, string filename, IList<string> ns) : base(node, filename, ns)
+        public Structure(ITree node, string filename, string package, IList<string> ns) : base(node, filename, package, ns)
         {
             if ((node == null) || (node.Type != SpicaMLLexer.STRUCT))
             {
@@ -77,7 +79,7 @@ namespace Spica
 
                     case SpicaMLLexer.FIELD:
                         {
-                            Field f = new Field(node.GetChild(j), Filename, Namespace);
+                            Field f = new Field(node.GetChild(j), this, Filename, Namespace);
 
                             try
                             {
@@ -281,9 +283,17 @@ namespace Spica
 
         public override string ToString()
         {
-            return String.Format("struct {0} (hash {1}, {2} fields, {3} super types, {4} children) {5}",
-                                 Name, Hash, this.fields.Count, this.supertypes.Count, this.children.Count,
+            return String.Format("{0} ({1} fields, {2} super types, {3} children) {4}",
+                                 base.ToString(), this.fields.Count, this.supertypes.Count, this.children.Count,
                                  (Resolved ? "ok" : "types not resoved"));
+        }
+
+        protected override void UpdateFullName()
+        {
+            FullName = new List<string>(Namespace);
+            FullName.Add(Name);
+
+            FullNameString = NamespaceString + "/" + Name;
         }
     }
 }

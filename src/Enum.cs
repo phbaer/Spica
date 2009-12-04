@@ -11,7 +11,7 @@ namespace Spica
         protected int supertype = -1;
         protected ListDictionary<string, string> elements = null;
 
-        public Enum(ITree node, string filename, IList<string> ns) : base(node, filename, ns)
+        public Enum(ITree node, string filename, string package, IList<string> ns) : base(node, filename, package, ns)
         {
             // Sanilty checks
             if ((node == null) || (node.Type != SpicaMLLexer.ENUM))
@@ -44,7 +44,7 @@ namespace Spica
 
                             if (child.ChildCount < 2)
                             {
-                                throw new CException("SpicaML: Unable to extract enumeration item for {0}!", this.Name);
+                                throw new CException("SpicaML: Unable to extract enumeration item for {0}!", Name);
                             }
 
                             this.elements.Add(child.GetChild(0).Text, child.GetChild(1).Text);
@@ -98,7 +98,15 @@ namespace Spica
 
         public override string ToString()
         {
-            return String.Format("enum {0} (inherits {1}, hash {2}, {3} elements)", Name, SuperType, Hash, this.elements.Count);
+            return String.Format("{0} (inherits {1}, {2} elements)", base.ToString(), SuperType, this.elements.Count);
+        }
+
+        protected override void UpdateFullName()
+        {
+            FullName = new List<string>(Namespace);
+            FullName.Add(Name);
+
+            FullNameString = this.NamespaceString + "/" + Name;
         }
     }
 }

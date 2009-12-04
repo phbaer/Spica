@@ -111,6 +111,9 @@ namespace Spica.ROS
                     List<string[]> fields = new List<string[]>();
                     StreamReader reader = new StreamReader(File.OpenRead(f));
 
+                    // Structure name is defined by the file name
+                    string structure_name = Path.GetFileNameWithoutExtension(f);
+
                     string line = null;
                     while ((line = reader.ReadLine()) != null)
                     {
@@ -163,7 +166,8 @@ namespace Spica.ROS
                         fields.Add(parts);
                     }
 
-                    this.structures.Add(new Structure(this.path, fields));
+                    this.structures.Add(new Structure(
+                                structure_name, this.path, this.name, fields));
                 }
             }
 

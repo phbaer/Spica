@@ -19,8 +19,8 @@ namespace Spica
 
         protected IList<Annotations.Extract> extract = null;
 
-        public ModuleSubscribe(Module module, ITree node, string filename, IList<string> ns) :
-            base(node, filename, ns)
+        public ModuleSubscribe(Module module, ITree node, string filename, string package, IList<string> ns) :
+            base(node, filename, package, ns)
         {
             if (node.Type != SpicaMLLexer.SUB)
             {
@@ -33,6 +33,7 @@ namespace Spica
             }
 
             this.module = module;
+
             Name = node.GetChild(0).Text;
 
             this.annDMC = this.module.subDefaultDMC;
@@ -103,6 +104,14 @@ namespace Spica
                 e.Resolve(elements);
             }
         }
+
+        protected override void UpdateFullName()
+        {
+            FullName = new List<string>(this.module.FullName);
+            FullName.Add(Name);
+
+            FullNameString = this.module.FullNameString + ":" + Name;
+        }
     }
 
     public class ModulePublish : Element
@@ -115,8 +124,8 @@ namespace Spica
         protected Annotations.Period annPeriod = null;
         protected Annotations.Period annTTL = null;
 
-        public ModulePublish(Module module, ITree node, string filename, IList<string> ns) :
-            base(node, filename, ns)
+        public ModulePublish(Module module, ITree node, string filename, string package, IList<string> ns) :
+            base(node, filename, package, ns)
         {
             if (node.Type != SpicaMLLexer.PUB)
             {
@@ -129,6 +138,7 @@ namespace Spica
             }
 
             this.module = module;
+
             Name = node.GetChild(0).Text;
 
             this.annDMC = this.module.pubDefaultDMC;
@@ -171,6 +181,14 @@ namespace Spica
 
         internal override bool Resolved { get { return true; } }
         internal override void Resolve(IList<Element> elements) { }
+
+        protected override void UpdateFullName()
+        {
+            FullName = new List<string>(this.module.FullName);
+            FullName.Add(Name);
+
+            FullNameString = this.module.FullNameString + ":" + Name;
+        }
     }
 
 
@@ -193,7 +211,7 @@ namespace Spica
         protected IList<ModuleSubscribe> subs = null;
         protected IList<ModulePublish> pubs = null;
 
-        public Module(ITree node, string filename, IList<string> ns) : base(node, filename, ns)
+        public Module(ITree node, string filename, string package, IList<string> ns) : base(node, filename, package, ns)
         {
             if ((node == null) || (node.Type != SpicaMLLexer.MODULE))
             {
@@ -238,7 +256,7 @@ namespace Spica
 
                     // Extract publications
                     case SpicaMLLexer.PUB:
-                        this.pubs.Add(new ModulePublish(this, node.GetChild(j), Filename, Namespace));
+                        this.pubs.Add(new ModulePublish(this, node.GetChild(j), Filename, Package, Namespace));
                         break;
 
                     // Extract subscription defaults
@@ -283,7 +301,7 @@ namespace Spica
 
                     // Extract subscriptions
                     case SpicaMLLexer.SUB:
-                        this.subs.Add(new ModuleSubscribe(this, node.GetChild(j), Filename, Namespace));
+                        this.subs.Add(new ModuleSubscribe(this, node.GetChild(j), Filename, Package, Namespace));
                         break;
                 }
             }
@@ -437,8 +455,16 @@ namespace Spica
 
         public override string ToString()
         {
-            return String.Format("module {0} (hash {1}, {2} pubs, {3} subs) {4}",
-                                 Name, Hash, this.pubs.Count, this.subs.Count, (Resolved ? "ok" : "types not resoved"));
+            return String.Format("{0} ({1} pubs, {2} subs) {3}",
+                                 base.ToString(), this.pubs.Count, this.subs.Count, (Resolved ? "ok" : "types not resoved"));
+        }
+
+        protected override void UpdateFullName()
+        {
+            FullName = new List<string>(Namespace);
+            FullName.Add(Name);
+
+            FullNameString = this.NamespaceString + "/Module/" + Name;
         }
     }
 }

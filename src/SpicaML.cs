@@ -171,7 +171,7 @@ namespace Spica
 
                 case SpicaMLLexer.STRUCT:
                     {
-                        Structure s = new Structure(node, filename, Namespace);
+                        Structure s = new Structure(node, filename, null, Namespace);
 
                         foreach (Element elem in this.elements)
                         {
@@ -187,7 +187,7 @@ namespace Spica
                     
                 case SpicaMLLexer.ENUM:
                     {
-                        Enum e = new Enum(node, filename, Namespace);
+                        Enum e = new Enum(node, filename, null, Namespace);
 
                         foreach (Element elem in this.elements)
                         {
@@ -203,7 +203,7 @@ namespace Spica
                     
                 case SpicaMLLexer.MODULE:
                     {
-                        Module m = new Module(node, filename, Namespace);
+                        Module m = new Module(node, filename, null, Namespace);
 
                         foreach (Element elem in this.elements)
                         {
