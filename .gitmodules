@@ -1,6 +1,6 @@
-[submodule "Castor"]
-	path = Castor
-	url = git@github.com:/phbaer/Castor.git
 [submodule "Geminga"]
 	path = Geminga
 	url = git@github.com:/phbaer/Geminga.git
+[submodule "Castor"]
+	path = Castor
+	url = git@github.com:/phbaer/Castor.git
